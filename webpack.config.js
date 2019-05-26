@@ -1,9 +1,10 @@
 var webpack = require('webpack');
 var path = require('path');
-const { VueLoaderPlugin } = require('vue-loader')
+const { VueLoaderPlugin } = require('vue-loader');
+let jsUrl = require('./jsCompile.json').jsUrl;
 
 module.exports = {
-  entry: './fans/create-fans.js',
+  entry: jsUrl,
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'my_bundle.js'
@@ -12,7 +13,7 @@ module.exports = {
     rules: [
         { test: /\.js$/,
          loader: 'babel-loader',
-         include: /node_modules/, 
+         include: /node_modules/,
          query: {
                 presets: ['es2015']
             }
@@ -46,6 +47,6 @@ module.exports = {
      extensions: [".js", ".json", ".jsx", ".css"],
     },
     plugins: [
-      new VueLoaderPlugin()
+      // new VueLoaderPlugin()
     ]
 };
