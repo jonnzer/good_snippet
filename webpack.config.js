@@ -1,8 +1,9 @@
 var webpack = require('webpack');
 var path = require('path');
+const { VueLoaderPlugin } = require('vue-loader')
 
 module.exports = {
-  entry: './index.js',
+  entry: './fans/create-fans.js',
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'my_bundle.js'
@@ -15,7 +16,28 @@ module.exports = {
          query: {
                 presets: ['es2015']
             }
-         }
+         },
+         {
+          test: /\.vue$/,
+          use:[
+              {
+                  loader: 'vue-loader',
+              },
+          ],
+        },
+        {
+          test: /\.css$/,
+          use: [
+            'style-loader',
+            'css-loader'
+          ]
+        },
+        {
+          test: /\.(woff|woff2|eot|ttf|otf)$/,
+          use: [
+              'file-loader'
+           ]
+       }
      ]
     },
   resolve: {
@@ -23,5 +45,7 @@ module.exports = {
     // （不适用于对 loader 解析）
      extensions: [".js", ".json", ".jsx", ".css"],
     },
-    plugins: []
+    plugins: [
+      new VueLoaderPlugin()
+    ]
 };

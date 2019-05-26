@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="keywords" content="html5、css3、jquery">
+    <meta name="description" content="一个前端工作者的学习笔记">
+    <script src="http://csdnimg.cn/public/common/libs/jquery/jquery-1.9.1.min.js"></script>
+    <title>Html5 Canvas 实现图片合成 |</title>
+    <style>
+        .hide {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <!--画布 -->
+    <canvas id="canvas" class="hide">
+        Your browser does not support the HTML5 canvas tag.
+    </canvas>
+    <!--背景图-->
+    <img id="page2_bg" src="./test1.jpg" class="hide" />
+    <!--二维码-->
+    <img id="test1" class="hide" src="./test2.jpg" />
+    <!--装图片的容器-->
+    <div id="new-img-div" class="hide">
+        <img src="./test1.jpg" class="close-img" />
+        <div id="onlyoneImg"></div>
+    </div>
+
+    <script>
+        //给canvas定宽高
+        var bodyW = $('body').width() + 'px';
+        var bodyH = $('body').height() + 'px';
+        console.log('bodyW', bodyW);
+        console.log('bodyH', bodyH);
+        $("#canvas").attr('width', '640px')
+        $("#canvas").attr('height', '1138px')
+
+        //画图函数
+        function writeTextOnCanvas(cns, lh, rw, text) {
+            var cns = document.getElementById(cns);
+            var ctx = cns.getContext("2d");
+            //提供canvas的数据
+            var canvasW = $('#canvas').width();
+            var canvasH = $('#canvas').height();
+            console.log('canvasW', canvasW)
+            //
+            var wordsTop = canvasH * 0.185;
+            var wordsLeft = canvasW * 0.195;
+            var wordsAllWidth = canvasW * 0.65;
+
+            console.log(wordsAllWidth)
+            var wordsNumOnline = parseInt(wordsAllWidth / 12)
+            var img1 = document.getElementById("page2_bg");
+            var img2 = document.getElementById("test1");
+            //var img111 = img1.attr('src');
+            console.log(img1);
+
+            //画背景
+            ctx.drawImage(img1, 0, 0, canvasW, canvasH);
+            //画二维码
+            ctx.drawImage(img2, 428, 884, 171, 172);
+
+            //处理文字
+            var lineheight = lh;
+            var text = text;
+            ctx.width = cns.width;
+            ctx.height = cns.height;
+            //字体大小必须和字体类型一起设置
+            ctx.font = "24px Helvetica";
+            //字体颜色
+            ctx.fillStyle = '#f6dda0';
+            function getTrueLength(str) {//获取字符串的真实长度（字节长度）
+                var len = str.length, truelen = 0;
+                for (var x = 0; x < len; x++) {
+                    if (str.charCodeAt(x) > 128) {
+                        truelen += 2;
+                    } else {
+                        truelen += 1;
+                    }
+                }
+                return truelen;
+            }
+            function cutString(str, leng) {//按字节长度截取字符串，返回substr截取位置
+                var len = str.length, tlen = len, nlen = 0;
+                for (var x = 0; x < len; x++) {
+                    if (str.charCodeAt(x) > 128) {
+                        console.log('汉字')
+                        if (nlen + 2 < leng) {
+                            nlen += 2;
+                        } else {
+                            tlen = x;
+                            break;
+                        }
+                    } else {
+                        console.log('字符')
+                        if (nlen + 1 < leng) {
+                            nlen += 1;
+                        } else {
+                            tlen = x;
+                            break;
+                        }
+                    }
+                }
+                return tlen;
+            }
+            for (var i = 1; getTrueLength(text) > 0; i++) {//分行
+                var tl = cutString(text, wordsNumOnline);
+                ctx.fillText(text.substr(0, tl).replace(/^\s+|\s+$/, ""), wordsLeft, i * lineheight + wordsTop);
+                text = text.substr(tl);
+            }
+
+            //转化成图片
+            var flagImg = document.createElement("img");
+            flagImg.setAttribute("crossOrigin",'Anonymous')
+            flagImg.src = cns.toDataURL("image/png");
+
+            $("#onlyoneImg").append(flagImg);
+            $('#canvas').addClass('hide');
+        }
+        writeTextOnCanvas("canvas", 32, 40, '祝你新年快乐，万事如意');
+    </script>
+</body>
+
+</html>
