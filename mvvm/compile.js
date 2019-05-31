@@ -5,9 +5,6 @@
  * })
  */
 
-
-
-
 /**
  *
  * @param options 参考vue实例化时传进的对象,代表我们存储的所有对象
@@ -44,18 +41,47 @@ function observe(data) { // 观察对象，增加Object.defineProperty
  * @constructor
  * note:
  * (1) 文档碎片
+ * (2) regExp.$n: --[https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/RegExp/n]
+ * (3)正则图形化 https://regexper.com/
+ * (4)正则对照表：http://tool.oschina.net/uploads/apidocs/jquery/regexp.html
  */
 function Compile(el, vm) {
     vm.$el = document.querySelector(el);
     let fragment = document.createDocumentFragment();
+    let child;
+    // 此处用到了appendChild的一个特性：对于被添加的子节点，如果之前已经存在，则会销毁自己在dom树的节点，然后把自己添加到新的地方
+    // 因此vm.$el.firstChild才会不停地切换成下一个子节点。
+    // --[https://developer.mozilla.org/zh-CN/docs/Web/API/Node/appendChild]
+
     while (child = vm.$el.firstChild) {
         fragment.appendChild(child);
     }
-    Array.from(fragment.childNodes).forEach(function (node) {
-        let test = node.textContent;
-        // let reg = ***;
-    })
-    vm.$el.appendChild(fragment);
+    replace(fragment);
+    /**
+     * Array.from 将伪数组对象转为数组实例
+      textContext: 节点内容
+      节点类型--[https://developer.mozilla.org/zh-CN/docs/Web/API/Node/nodeType] nodeType为3时，是element或者属性中的字
+      之所以抽离出方法，是因为想要重复调用，当子节点里还有子节点时，可以调用。
+     */
+    function replace(fragment) {
+        Array.from(fragment.childNodes).forEach(function (node) {
+            let text = node.textContent;
+            let reg = /\{\{(.*)\}\}/;
+            if (node.nodeType === 3 && reg.test(text)) {
+               text = text.replace(reg, '$1'); // 正则匹配中第一个括号所代表的内容
+                let pointArr = text.split('.'); // a.a
+                let existVal = vm;
+                pointArr.forEach(function (key) { // 遍历所有key，一级复一级的遍历
+                    existVal = existVal[key];
+                });
+                node.textContent = node.textContent.replace(reg, existVal);
+            }
+            if (node.childNodes) {
+                replace(node);
+            }
+            vm.$el.appendChild(fragment);
+        });
+    }
 }
 
 
@@ -86,10 +112,40 @@ function Observe(data) { // 实际观察方法,主要逻辑
     }
 }
 
-// test1
+/**
+ * 发布订阅函数
+ * @Dep
+ */
+function Dep() {
+    this.subs = []; // 事件池
+}
+Dep.prototype.addSub = function (sub) { // 订阅
+    this.subs.push(sub);
+};
+Dep.prototype.notify = function () { // 通知
+    this.subs.forEach(sub => {
+        sub.update();
+    })
+};
+
+/**
+ * 事件池其中的一个
+ * @param fn
+ * @constructor
+ */
+function Watcher(fn) { // fn是事件
+    this.fn = fn;
+}
+Watcher.prototype.update = function () {
+    this.fn();
+};
+
+// 调用
 let little = new demoVue({
     el: "#app",
-    data: {a:1}
+    data: {
+            a: {a:"我是a"},
+            b: "我是b"
+    }
 });
-console.log(little);
-window.little = little;
+// window.little = little;
