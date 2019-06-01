@@ -54,7 +54,7 @@ function Compile(el, vm) {
     Array.from(fragment.childNodes).forEach(function (node) {
         let test = node.textContent;
         // let reg = ***;
-    })
+    });
     vm.$el.appendChild(fragment);
 }
 
@@ -89,7 +89,10 @@ function Observe(data) { // 实际观察方法,主要逻辑
 // test1
 let little = new demoVue({
     el: "#app",
-    data: {a:1}
+    data: {
+        a: {a: "我是a.a"},
+        b: "我是b"
+    }
 });
 console.log(little);
 window.little = little;
