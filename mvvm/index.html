@@ -10,5 +10,17 @@
         <div>{{b}}</div>
     </div>
 </body>
-<script src="../dist/my_bundle.js"></script>
+<!--<script src="../dist/my_bundle.js"></script>-->
+<script src="./compile.js"></script>
+<script>
+    // 调用
+    let little = new demoVue({
+        el: "#app",
+        data: {
+            a: {a:"1"},
+            b: "2"
+        }
+    });
+
+</script>
 </html>

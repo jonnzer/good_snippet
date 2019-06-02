@@ -66,15 +66,20 @@ function Compile(el, vm) {
     function replace(fragment) {
         Array.from(fragment.childNodes).forEach(function (node) {
             let text = node.textContent;
+            let exp;
             let reg = /\{\{(.*)\}\}/;
             if (node.nodeType === 3 && reg.test(text)) {
-               text = text.replace(reg, '$1'); // 正则匹配中第一个括号所代表的内容
-                let pointArr = text.split('.'); // a.a
+               exp = text.replace(reg, '$1'); // 正则匹配中第一个括号所代表的内容
+                let pointArr = exp.split('.'); // a.a
                 let existVal = vm;
                 pointArr.forEach(function (key) { // 遍历所有key，一级复一级的遍历
                     existVal = existVal[key];
                 });
-                node.textContent = node.textContent.replace(reg, existVal);
+                // Watcher使用地方
+                new Watcher(vm,exp,function (newVal) {
+                    node.textContent = text.replace(reg, newVal);
+                });
+                node.textContent = text.replace(reg, existVal);
             }
             if (node.childNodes) {
                 replace(node);
@@ -92,12 +97,17 @@ function Compile(el, vm) {
  * @constructor
  */
 function Observe(data) { // 实际观察方法,主要逻辑
+    let dep = new Dep();
     for (let key in data) {
         let val = data[key];
-        // observe(val);
+        observe(val);
         Object.defineProperty(data,key, {
             enumerable: true,
             get() {
+                // 此时Dep.target是this
+                if (Dep.target) {
+                    dep.addSub(Dep.target); // 添加事件订阅（watcher 的 push）
+                }
                 return val;
             },
             set(newVal) {
@@ -106,6 +116,7 @@ function Observe(data) { // 实际观察方法,主要逻辑
                 } else {
                     val = newVal; // 这是为了获取值时，将最新的值通过get返回出去。
                     observe(newVal);
+                    dep.notify(); // 添加事件的通知更新）（watcher的update）
                 }
             }
         })
@@ -130,22 +141,33 @@ Dep.prototype.notify = function () { // 通知
 
 /**
  * 事件池其中的一个
- * @param fn
+ * @param vm: 实例环境（总的数据来源）
+ * @param 正则表达式的遍历对象exp (要更改的对象)
+ * @param fn（处理的回调函数）
  * @constructor
  */
-function Watcher(fn) { // fn是事件
+function Watcher(vm,exp,fn) { // fn是事件
+    this.vm = vm;
+    this.exp = exp;
     this.fn = fn;
+
+    // 添加到订阅中
+    // Dep.target ??? 扮演着一个watcher对象，也是Watcher的实例
+    Dep.target = this;
+    let val = vm;
+    let arr = exp.split('.');
+    arr.forEach(function (k) { // 这里获取 this.a.a时还是会触发到默认的getter
+        val = val[k];
+    });
+    Dep.target = null;
+
 }
 Watcher.prototype.update = function () {
-    this.fn();
+    let val = this.vm;
+    let arr = this.exp.split('.');
+    arr.forEach(function (k) {
+        val = val[k];
+    });
+    this.fn(val);
 };
 
-// 调用
-let little = new demoVue({
-    el: "#app",
-    data: {
-            a: {a:"我是a"},
-            b: "我是b"
-    }
-});
-// window.little = little;
