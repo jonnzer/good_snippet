@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>测试PWA</title>
+    <link rel="stylesheet" href="main.css">
+    <link rel="manifest" href="manifest.json">
+</head>
+<body>
+    <p>new paragraph</p>
+    <h3>this is 测试PWA</h3>
+    <script>
+        if(navigator.serviceWorker != null) {
+            navigator.serviceWorker.register('sw.js')
+            .then(function(registerStart){
+                console.log('支持sw', registerStart.scope)
+            })
+        }
+    </script>
+</body>
+</html>
