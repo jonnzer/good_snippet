@@ -1,3 +1,5 @@
+// 发布订阅模式 先订阅再发布
+
 function Dep() {
     this.subs = []; // 事件池
 }

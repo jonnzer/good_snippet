@@ -8,6 +8,8 @@
     <div id="app">
         <div>{{a.a}}</div>
         <div>{{b}}</div>
+        <input type="text" v-model="b">
+        <div>{{cacultate_c}}</div>
     </div>
 </body>
 <!--<script src="../dist/my_bundle.js"></script>-->
@@ -17,8 +19,21 @@
     let little = new demoVue({
         el: "#app",
         data: {
-            a: {a:"1"},
-            b: "2"
+            a: {a:"是a"},
+            b: "是b"
+        },
+        computed: {
+            cacultate_c: function() {
+                return this.a.a + this.b;
+            },
+            cacultate_d: {
+                get() {
+                    return this.a.a + this.b + this.b
+                },
+                set(val) {
+                    this.a = val
+                }
+            }
         }
     });
 
