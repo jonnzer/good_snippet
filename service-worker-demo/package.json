@@ -1,0 +1,21 @@
+{
+  "name": "sw-test-gh-pages",
+  "version": "1.0.0",
+  "description": "Service Worker test repository. This is a very simple demo to show basic service worker features in action. The demo can be seen on [our GitHub pages](https://mdn.github.io/sw-test/).",
+  "main": "app.js",
+  "scripts": {
+    "start": "webpack-dev-server --entry ./sw-test/app.js --output-filename ./dist/main.js",
+    "dev": "webpack  --watch",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "webpack": "^4.44.1",
+    "webpack-dev-server": "^3.11.0"
+  },
+  "devDependencies": {
+    "webpack-cli": "^3.3.12"
+  }
+}
