@@ -36,8 +36,8 @@ function diffChildren(oldChildren, newChirdren, index, patches) {
     })
 }
 
-// 定义差异类型
-var REPLACE = 0
-var REORDER = 1
-var PROPS = 2
-var TEXT = 3
+// 定义差异类型 
+var REPLACE = 0 // 替换原来的节点 比如换了标签
+var REORDER = 1 // 比如换了顺序
+var PROPS = 2   // 比如换了属性
+var TEXT = 3    // 比如换了文本节点
