@@ -34,7 +34,7 @@
     "webpack-cli": "^3.1.0"
   },
   "dependencies": {
-    "css-loader": "^1.0.0",
+    "css-loader": "^6.7.3",
     "element-ui": "^2.4.6",
     "style-loader": "^0.23.0",
     "vue": "^2.5.17",
